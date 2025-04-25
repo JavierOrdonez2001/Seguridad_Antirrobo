@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">AndroidMaster</string>
+    <string name="activate_deactivate">Activar</string>
+    <string name="texto_tutorial">
+        Para utilizar nuestra aplicación, simplemente
+        ingrese su correo electrónico y luego presione el
+        botón Activate. ¡Es así de sencillo!
+    </string>
+    <string name="sobre_nosotros">
+        Somos un grupo de desarrolladores apasionados de la empresa ficticia
+        SecureDrive Solutions. Nuestra app está diseñada para proteger su vehículo
+        usando sensores avanzados que detectan cualquier intento de ingreso no autorizado.
+        Recuerde revisar su correo electrónico cada vez que deje su auto solo o en un lugar
+        inseguro; ahí recibirá alertas inmediatas sobre la seguridad de su vehículo.
+    </string>
+</resources>
