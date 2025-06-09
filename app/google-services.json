@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "932632864292",
+    "project_id": "seguridadantirobovehiculo",
+    "storage_bucket": "seguridadantirobovehiculo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:932632864292:android:65e5c04fbc4c4c5738dab1",
+        "android_client_info": {
+          "package_name": "com.example.androidmaster"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1bqkhq6z446SbqKJRgqE4j-xOy5vyKGo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

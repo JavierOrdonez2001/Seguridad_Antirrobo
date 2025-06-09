@@ -12,11 +12,20 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import android.util.Log;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
-    Button activate;
-    Button btnAbout;
-    Boolean activo = false;
+
+    private EditText editTextEmail, editTextPassword;
+    private Button btnLogin;
+    private TextView textRegister;
+
+    private FirebaseAuth mAuth;
+
 
 
     @Override
@@ -32,48 +41,46 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        mAuth = FirebaseAuth.getInstance();
 
-        
-        activate = (Button) findViewById(R.id.activate_deactivate);
-        btnAbout = (Button) findViewById(R.id.btnAbout);
+        editTextEmail = findViewById(R.id.editTextEmail);
+        editTextPassword = findViewById(R.id.editTextPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+        textRegister = findViewById(R.id.textRegister);
 
+        btnLogin.setOnClickListener(v -> {
+            String email = editTextEmail.getText().toString().trim();
+            String password = editTextPassword.getText().toString().trim();
 
-        activate.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                //variable que se guardara en la nube fire base
-                String new_boolean = revertir_variable_activo().toString();
-
-                if (new_boolean.equals( "true")){
-                    activate.setText("Desactivar");
-                    activate.setBackgroundColor(Color.RED);
-                }
-                if (new_boolean.equals( "false")){
-                    activate.setText("Activar");
-                    activate.setBackgroundColor(Color.GREEN);
-                }
-                Log.i("BOLEAN", new_boolean);
+            if (email.isEmpty() || password.isEmpty()){
+                Toast.makeText(this,"Ingresa tu email y contraseña", Toast.LENGTH_SHORT).show();
+                return;
             }
-        });
 
-        btnAbout.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public  void onClick(View v){
-                Intent intent = new Intent(MainActivity.this, About.class);
-                startActivity(intent);
-            }
+            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+                if (task.isSuccessful()){
+                    Toast.makeText(this, "Bienvenido", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, ListaDatos.class));
+                    finish();
+                } else {
+                    Toast.makeText(this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
         });
 
 
-
-
+        textRegister.setOnClickListener(v -> {
+            startActivity(new Intent(this, Registro.class));
+        });
     }
 
+    @Override
+    protected void onStart(){
+        super.onStart();
 
-    private Boolean revertir_variable_activo(){
-        activo = !activo;
-        return activo;
+        if (mAuth.getCurrentUser() != null){
+            startActivity(new Intent(this, ListaDatos.class));
+            finish();
+        }
     }
-
-
 }
