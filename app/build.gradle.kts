@@ -63,6 +63,7 @@ dependencies {
    // Firebase Realtime Database (para enviar y leer ubicación del ESP32)
     implementation("com.google.firebase:firebase-database")
 
+    implementation("androidx.cardview:cardview:1.0.0")
 
 
 
