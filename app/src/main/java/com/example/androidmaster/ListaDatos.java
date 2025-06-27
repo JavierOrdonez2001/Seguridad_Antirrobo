@@ -190,6 +190,13 @@ public class ListaDatos extends AppCompatActivity {
             }
         }
 
+        Button btnConfigWifi = findViewById(R.id.btnConfigWifi);
+
+        btnConfigWifi.setOnClickListener(v -> {
+            Intent intent = new Intent(ListaDatos.this, ConfigWifiActivity.class);
+            startActivity(intent);
+        });
+
 
 
     }
