@@ -1,6 +1,8 @@
 package com.example.androidmaster;
 
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -13,7 +15,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,6 +33,9 @@ public class Seguimiento extends AppCompatActivity implements OnMapReadyCallback
 
     private Marker gpsMarker;
     private DatabaseReference gpsRef;
+    private com.google.android.gms.maps.model.Circle zonaSegura;
+    private boolean primerZoomHecho = false;
+
 
 
     @Override
@@ -61,6 +68,12 @@ public class Seguimiento extends AppCompatActivity implements OnMapReadyCallback
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Double latitud = snapshot.child("latitud").getValue(Double.class);
                 Double longitud = snapshot.child("longitud").getValue(Double.class);
+                Double velocidad = snapshot.child("velocidad").getValue(Double.class);
+                Double altitud = snapshot.child("altitud").getValue(Double.class);
+
+                String snippet = "";
+                if (velocidad != null) snippet += "Velocidad: " + String.format("%.2f", velocidad) + " km/h\n";
+                if (altitud != null) snippet += "Altitud: " + String.format("%.2f", altitud) + " m";
 
                 if (latitud != null && longitud != null && mMap != null){
                     LatLng nuevaUbicacion = new LatLng(latitud, longitud);
@@ -69,11 +82,29 @@ public class Seguimiento extends AppCompatActivity implements OnMapReadyCallback
                         gpsMarker = mMap.addMarker(new MarkerOptions()
                                 .position(nuevaUbicacion)
                                 .title("Ubicacion en tiempo real"));
+
+                        gpsMarker.showInfoWindow();
                     } else {
                         gpsMarker.setPosition(nuevaUbicacion);
+                        gpsMarker.setSnippet(snippet);
+                        gpsMarker.showInfoWindow();
                     }
 
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nuevaUbicacion, 16f));
+                    if (!primerZoomHecho) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(nuevaUbicacion, 16f));
+                        primerZoomHecho = true;
+                    }
+
+                    if (zonaSegura == null) {
+                        zonaSegura = mMap.addCircle(new com.google.android.gms.maps.model.CircleOptions()
+                                .center(nuevaUbicacion)
+                                .radius(20)
+                                .strokeColor(android.graphics.Color.BLUE)
+                                .fillColor(0x220000FF)
+                                .strokeWidth(2f));
+                    } else {
+                        zonaSegura.setCenter(nuevaUbicacion);
+                    }
                 }
             }
 
@@ -84,6 +115,25 @@ public class Seguimiento extends AppCompatActivity implements OnMapReadyCallback
         });
 
 
+        DatabaseReference vibracionRef = FirebaseDatabase.getInstance()
+                .getReference("UsersData")
+                .child(userId)
+                .child("sensor")
+                .child("vibracion");
+
+        vibracionRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Boolean vibracion = snapshot.getValue(Boolean.class);
+                if (zonaSegura != null && vibracion != null){
+                    zonaSegura.setStrokeColor(vibracion ? android.graphics.Color.RED : android.graphics.Color.BLUE);
+                    zonaSegura.setFillColor(vibracion ? 0x22FF0000 : 0x220000FF);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
 
 
     }
